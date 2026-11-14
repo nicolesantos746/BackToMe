@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/services/firebase';
 import LoginScreen from './src/screens/LoginScreen';
-import Button from './src/components/Button';
-import { colors, spacing, typography } from './src/theme';
+import HomeScreen from './src/screens/HomeScreen';
+import { colors } from './src/theme';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -21,27 +22,16 @@ export default function App() {
 
   if (initializing) {
     return (
-      <View style={[styles.container, styles.center]}>
+      <SafeAreaView style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      </SafeAreaView>
     );
   }
 
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <LoginScreen />
-      </View>
-    );
-  }
-
-  // Tela provisória: a lista de empréstimos entra no próximo passo
   return (
-    <View style={[styles.container, styles.center]}>
-      <Text style={styles.title}>Você está logado</Text>
-      <Text style={styles.email}>{user.email}</Text>
-      <Button title="Sair" variant="outline" onPress={() => signOut(auth)} />
-    </View>
+    <SafeAreaView style={styles.container}>
+      {user ? <HomeScreen /> : <LoginScreen />}
+    </SafeAreaView>
   );
 }
 
@@ -49,20 +39,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   center: {
     justifyContent: 'center',
-    padding: spacing.md,
-  },
-  title: {
-    ...typography.subtitle,
-    textAlign: 'center',
-  },
-  email: {
-    ...typography.body,
-    textAlign: 'center',
-    color: colors.textMuted,
-    marginBottom: spacing.md,
   },
 });
