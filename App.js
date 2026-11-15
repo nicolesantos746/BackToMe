@@ -8,6 +8,7 @@ import { auth } from './src/services/firebase';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AddLoanScreen from './src/screens/AddLoanScreen';
+import { LoansProvider } from './src/context/LoansContext';
 import { colors } from './src/theme';
 
 const Stack = createNativeStackNavigator();
@@ -40,31 +41,34 @@ export default function App() {
       </SafeAreaView>
     );
   } else {
+    // O estado global dos empréstimos só existe com o usuário logado
     content = (
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: { backgroundColor: colors.surface },
-            headerTintColor: colors.primary,
-            headerShadowVisible: false,
-          }}
-        >
-          <Stack.Screen name="Home" options={{ headerShown: false }}>
-            {({ navigation }) => (
-              <SafeAreaView style={styles.container}>
-                <HomeScreen onAdd={() => navigation.navigate('AddLoan')} />
-              </SafeAreaView>
-            )}
-          </Stack.Screen>
-          <Stack.Screen name="AddLoan" options={{ title: 'Novo empréstimo' }}>
-            {({ navigation }) => (
-              <SafeAreaView style={styles.container} edges={['bottom']}>
-                <AddLoanScreen onDone={() => navigation.goBack()} />
-              </SafeAreaView>
-            )}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
+      <LoansProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerStyle: { backgroundColor: colors.surface },
+              headerTintColor: colors.primary,
+              headerShadowVisible: false,
+            }}
+          >
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
+              {({ navigation }) => (
+                <SafeAreaView style={styles.container}>
+                  <HomeScreen onAdd={() => navigation.navigate('AddLoan')} />
+                </SafeAreaView>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="AddLoan" options={{ title: 'Novo empréstimo' }}>
+              {({ navigation }) => (
+                <SafeAreaView style={styles.container} edges={['bottom']}>
+                  <AddLoanScreen onDone={() => navigation.goBack()} />
+                </SafeAreaView>
+              )}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </LoansProvider>
     );
   }
 

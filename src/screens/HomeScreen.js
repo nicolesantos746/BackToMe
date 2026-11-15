@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { markAsReturned, removeLoan, subscribeLoans } from '../services/loansService';
+import { useLoans } from '../context/LoansContext';
 import LoanCard from '../components/LoanCard';
 import EmptyState from '../components/EmptyState';
 import Loading from '../components/Loading';
@@ -11,54 +11,20 @@ import Button from '../components/Button';
 import { colors, spacing, typography } from '../theme';
 
 export default function HomeScreen({ onAdd }) {
-  const [loans, setLoans] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [feedback, setFeedback] = useState(null);
-
-  useEffect(() => {
-    // Atualiza a lista sozinha sempre que algo muda no Firestore
-    const unsubscribe = subscribeLoans(
-      (list) => {
-        setLoans(list);
-        setLoading(false);
-      },
-      () => {
-        setLoading(false);
-        setFeedback({ type: 'error', message: 'Não foi possível carregar os empréstimos.' });
-      }
-    );
-    return unsubscribe;
-  }, []);
-
-  async function handleReturned(loan) {
-    try {
-      await markAsReturned(loan.id);
-      setFeedback({ type: 'success', message: 'Marcado como devolvido.' });
-    } catch (error) {
-      setFeedback({ type: 'error', message: 'Não foi possível atualizar o empréstimo.' });
-    }
-  }
-
-  async function handleRemove(loan) {
-    try {
-      await removeLoan(loan.id);
-      setFeedback({ type: 'success', message: 'Empréstimo excluído.' });
-    } catch (error) {
-      setFeedback({ type: 'error', message: 'Não foi possível excluir o empréstimo.' });
-    }
-  }
+  // Estado global (Context API + useReducer): lista, loading e mensagens de feedback
+  const { loans, loading, feedback, returnLoan, deleteLoan, clearFeedback } = useLoans();
 
   function confirmRemove(loan) {
     Alert.alert('Excluir empréstimo', `Excluir "${loan.itemName}"? Essa ação não pode ser desfeita.`, [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: () => handleRemove(loan) },
+      { text: 'Excluir', style: 'destructive', onPress: () => deleteLoan(loan) },
     ]);
   }
 
   function handlePress(loan) {
     const buttons = [];
     if (!loan.returned) {
-      buttons.push({ text: 'Marcar como devolvido', onPress: () => handleReturned(loan) });
+      buttons.push({ text: 'Marcar como devolvido', onPress: () => returnLoan(loan) });
     }
     buttons.push({ text: 'Excluir', style: 'destructive', onPress: () => confirmRemove(loan) });
     buttons.push({ text: 'Cancelar', style: 'cancel' });
@@ -74,7 +40,7 @@ export default function HomeScreen({ onAdd }) {
         </Text>
       </View>
 
-      <FeedbackBanner feedback={feedback} onDismiss={() => setFeedback(null)} />
+      <FeedbackBanner feedback={feedback} onDismiss={clearFeedback} />
 
       {loading ? (
         <Loading />
