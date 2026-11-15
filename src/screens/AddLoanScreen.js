@@ -2,32 +2,19 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { addLoan } from '../services/loansService';
 import { LOAN_TYPES } from '../constants/loanTypes';
-import { parseAmount } from '../utils/format';
+import { parseAmount, startOfToday } from '../utils/format';
 import Button from '../components/Button';
+import DateField from '../components/DateField';
 import Input from '../components/Input';
 import FeedbackBanner from '../components/FeedbackBanner';
 import { colors, spacing, typography } from '../theme';
-
-// Converte "25/12/2026" em ISO completo (meia-noite no horário local).
-// Devolve null se o texto não for uma data válida.
-function parseDateBR(text) {
-  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text.trim());
-  if (!match) return null;
-  const day = Number(match[1]);
-  const month = Number(match[2]);
-  const year = Number(match[3]);
-  const date = new Date(year, month - 1, day);
-  const valid =
-    date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-  return valid ? date.toISOString() : null;
-}
 
 export default function AddLoanScreen({ onDone }) {
   const [itemType, setItemType] = useState('livro');
   const [itemName, setItemName] = useState('');
   const [borrowerName, setBorrowerName] = useState('');
   const [amountText, setAmountText] = useState('');
-  const [dueDateText, setDueDateText] = useState('');
+  const [dueDate, setDueDate] = useState(null);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -42,8 +29,8 @@ export default function AddLoanScreen({ onDone }) {
       const value = parseAmount(amountText);
       if (Number.isNaN(value) || value <= 0) found.amount = 'Informe um valor maior que zero.';
     }
-    if (dueDateText.trim() && !parseDateBR(dueDateText)) {
-      found.dueDate = 'Use o formato DD/MM/AAAA.';
+    if (dueDate && dueDate < startOfToday()) {
+      found.dueDate = 'A data de devolução não pode estar no passado.';
     }
     setErrors(found);
     return Object.keys(found).length === 0;
@@ -59,7 +46,7 @@ export default function AddLoanScreen({ onDone }) {
         itemName: itemName.trim(),
         borrowerName: borrowerName.trim(),
         amount: isMoney ? parseAmount(amountText) : null,
-        dueDate: dueDateText.trim() ? parseDateBR(dueDateText) : null,
+        dueDate: dueDate ? dueDate.toISOString() : null,
       });
       if (onDone) onDone();
     } catch (error) {
@@ -118,13 +105,16 @@ export default function AddLoanScreen({ onDone }) {
           error={errors.borrowerName}
         />
 
-        <Input
+        <DateField
           label="Devolver até (opcional)"
-          value={dueDateText}
-          onChangeText={setDueDateText}
-          placeholder="DD/MM/AAAA"
-          keyboardType="numbers-and-punctuation"
+          value={dueDate}
+          onChange={(date) => {
+            setDueDate(date);
+            setErrors((current) => ({ ...current, dueDate: undefined }));
+          }}
+          minimumDate={startOfToday()}
           error={errors.dueDate}
+          disabled={saving}
         />
 
         <Button title="Salvar" onPress={handleSave} loading={saving} />
