@@ -20,7 +20,7 @@ Projeto Final da disciplina de desenvolvimento mobile.
 
 | Login | Empréstimos | Novo empréstimo | Conta |
 | --- | --- | --- | --- |
-| ![Login](docs/screenshots/login.png) | ![Empréstimos](docs/screenshots/emprestimos.png) | ![Novo empréstimo](docs/screenshots/novo-emprestimo.png) | ![Conta](docs/screenshots/conta.png) |
+| ![Login](docs/screenshots/login.jpg) | ![Empréstimos](docs/screenshots/emprestimos.jpg) | ![Novo empréstimo](docs/screenshots/novo-emprestimo.jpg) | ![Conta](docs/screenshots/conta.jpg) |
 
 ## Tecnologias
 
