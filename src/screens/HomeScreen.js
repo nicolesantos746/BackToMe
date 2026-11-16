@@ -1,7 +1,5 @@
 import React from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '../services/firebase';
 import { useLoans } from '../context/LoansContext';
 import LoanCard from '../components/LoanCard';
 import EmptyState from '../components/EmptyState';
@@ -35,9 +33,6 @@ export default function HomeScreen({ onAdd }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Meus empréstimos</Text>
-        <Text style={styles.email} numberOfLines={1}>
-          {auth.currentUser ? auth.currentUser.email : ''}
-        </Text>
       </View>
 
       <FeedbackBanner feedback={feedback} onDismiss={clearFeedback} />
@@ -61,12 +56,6 @@ export default function HomeScreen({ onAdd }) {
 
       <View style={styles.footer}>
         <Button title="Novo empréstimo" onPress={() => onAdd && onAdd()} />
-        <Button
-          title="Sair"
-          variant="outline"
-          onPress={() => signOut(auth)}
-          style={styles.signOut}
-        />
       </View>
     </View>
   );
@@ -83,10 +72,6 @@ const styles = StyleSheet.create({
   title: {
     ...typography.title,
   },
-  email: {
-    ...typography.caption,
-    marginTop: spacing.xs,
-  },
   list: {
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
@@ -96,8 +81,5 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: spacing.md,
-  },
-  signOut: {
-    marginTop: spacing.sm,
   },
 });

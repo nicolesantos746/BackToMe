@@ -6,8 +6,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/services/firebase';
 import LoginScreen from './src/screens/LoginScreen';
-import HomeScreen from './src/screens/HomeScreen';
 import AddLoanScreen from './src/screens/AddLoanScreen';
+import MainTabs from './src/navigation/MainTabs';
 import { LoansProvider } from './src/context/LoansContext';
 import { colors } from './src/theme';
 
@@ -52,13 +52,7 @@ export default function App() {
               headerShadowVisible: false,
             }}
           >
-            <Stack.Screen name="Home" options={{ headerShown: false }}>
-              {({ navigation }) => (
-                <SafeAreaView style={styles.container}>
-                  <HomeScreen onAdd={() => navigation.navigate('AddLoan')} />
-                </SafeAreaView>
-              )}
-            </Stack.Screen>
+            <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
             <Stack.Screen name="AddLoan" options={{ title: 'Novo empréstimo' }}>
               {({ navigation }) => (
                 <SafeAreaView style={styles.container} edges={['bottom']}>
