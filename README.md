@@ -154,3 +154,6 @@ Pull Requests integrados na `develop`:
 ## Vídeo demonstrativo
 
 > Link do vídeo (3 a 5 minutos): _adicionar aqui_
+## Demonstração
+
+O aplicativo será demonstrado em apresentação técnica em sala, rodando em dispositivo físico (Expo Go).
